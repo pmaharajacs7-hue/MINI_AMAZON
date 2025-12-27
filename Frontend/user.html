@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mini Amazon - Shop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #eaeded; }
+        header { background: #131921; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .card img { max-width: 100%; height: 180px; object-fit: contain; }
+        .price { color: #B12704; font-size: 1.2em; font-weight: bold; }
+        .buy-btn { background: #ffd814; border: 1px solid #fcd200; padding: 8px 20px; border-radius: 20px; cursor: pointer; width: 100%; font-weight: bold; }
+        .buy-btn:hover { background: #f7ca00; }
+        .logout { color: white; text-decoration: none; border: 1px solid white; padding: 5px 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2 style="margin:0;">Mini Amazon</h2>
+    <a href="index.html" class="logout">Sign Out</a>
+</header>
+
+<div class="container" id="productGrid">
+    </div>
+
+<script>
+    // 1. Fetch products from your @GetMapping("/PRODUCT/Users")
+    function loadStore() {
+        fetch('http://localhost:8080/PRODUCT/Users')
+            .then(res => res.json())
+            .then(products => {
+                const grid = document.getElementById('productGrid');
+                grid.innerHTML = products.map(p => `
+                    <div class="card">
+                        <img src="${p.imageUrl || 'https://via.placeholder.com/200'}" alt="${p.prname}">
+                        <h3>${p.prname}</h3>
+                        <p class="price">₹${p.amount}</p>
+                        <p style="color: gray; font-size: 0.9em;">Category: ${p.category}</p>
+                        <button class="buy-btn" onclick="confirmPurchase('${p.prname}', ${p.amount})">Buy Now</button>
+                    </div>
+                `).join('');
+            })
+            .catch(err => console.error("Could not load products"));
+    }
+
+    // 2. Send order to your @PostMapping("/ORDER/User/post")
+    function confirmPurchase(name, price) {
+        const orderData = {
+            prname: name,
+            quantity: 1,
+            total_am: price,
+            userId: 1 // Default user for your test
+        };
+
+        fetch('http://localhost:8080/ORDER/User/post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(res => {
+            alert("Order placed for " + name + "! Check your Database.");
+        })
+        .catch(err => alert("Order failed. Check Backend."));
+    }
+
+    // Run on page load
+    loadStore();
+</script>
+
+</body>
+</html>

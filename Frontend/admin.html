@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mini Amazon - Login</title>
+    <style>
+        body { font-family: Arial; background: #f3f3f3; display: flex; justify-content: center; padding-top: 50px; }
+        .box { background: white; padding: 30px; border: 1px solid #ddd; width: 300px; border-radius: 5px; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 3px; border: 1px solid #ccc; }
+        button { background: #f0c14b; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Sign-In</h2>
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="phnum" placeholder="Phone Number">
+        <select id="role">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+        </select>
+        <button onclick="login()">Continue</button>
+    </div>
+
+    <script>
+        function login() {
+            const data = {
+                name: document.getElementById('name').value,
+                phnum: document.getElementById('phnum').value,
+                roll: document.getElementById('role').value
+            };
+
+            const endpoint = data.roll === 'Admin' ? '/SignIn/Admin' : '/SignIn/User';
+
+            fetch('http://localhost:8080' + endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if(data.roll === 'Admin') window.location.href = 'admin.html';
+                else window.location.href = 'user.html';
+            })
+            .catch(err => alert("Backend Error! Check if Spring Boot is running."));
+        }
+    </script>
+</body>
+</html>
